@@ -9,6 +9,7 @@ export const AuthenticationProvider = ({ children }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [doctorId, setDoctorId] = useState("");
 
   const navigate = useNavigate();
 
@@ -66,6 +67,8 @@ export const AuthenticationProvider = ({ children }) => {
         const response = await loginDoctor(credentials);
         if (response.success) {
           localStorage.setItem("access_token", response.token);
+          localStorage.setItem("doctorId", response.doctor.doctorId);
+
           setIsLoading(false);
           navigate("/doctor-dashboard");
         } else {
@@ -140,6 +143,7 @@ export const AuthenticationProvider = ({ children }) => {
         const response = await registerDoctor(credentials);
         if (response.success) {
           localStorage.setItem("access_token", response.token);
+          localStorage.setItem("doctorId", response.doctor.doctorId);
           setIsLoading(false);
           navigate("/doctor-dashboard");
         } else {

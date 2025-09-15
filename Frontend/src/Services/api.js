@@ -19,6 +19,12 @@ export const addPatient = async (formData) => {
   return response.data;
 };
 
+export const getPatientsList = async (doctorId) => {
+  const response = await axiosInstance.get(apiUrl.GETPATIENTLIST(doctorId));
+  return response.data;
+};
+
+
 
 
 

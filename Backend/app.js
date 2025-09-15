@@ -16,6 +16,9 @@ app.use(
   })
 );
 
+app.use("/reports", express.static("uploads/reports"));
+
+
 app.get("/", (req, res) => {
   res.send("Hello Guyss This is ChikitsaVerse Backend");
 });

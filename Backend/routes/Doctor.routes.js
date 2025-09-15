@@ -1,8 +1,13 @@
 const express = require("express");
-const doctorRouter = express.Router();
-const {body}=require("express-validator");
-const doctorController = require("../controllers/Doctor.controller");
+const { body } = require("express-validator");
+const multer = require("multer");
 const authMiddleware = require("../middlewares/authMiddleware");
+const doctorController = require("../controllers/Doctor.controller");
+
+const doctorRouter = express.Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 
 
 doctorRouter.post(
@@ -55,6 +60,7 @@ doctorRouter.post("/login",[
 doctorRouter.post(
   "/add-patient",
   authMiddleware,
+  upload.single("analysis_report"), // 👈 handles PDF file + text fields
   [
     // Demographics validation
     body("first_name").notEmpty().withMessage("First name is required"),
@@ -109,7 +115,10 @@ doctorRouter.post(
 
     // Mental Health
     body("stress_level").optional().toInt().isInt({ min: 1, max: 10 }),
-    body("sleep_quality_hours").optional().toFloat().isFloat({ min: 0, max: 24 }),
+    body("sleep_quality_hours")
+      .optional()
+      .toFloat()
+      .isFloat({ min: 0, max: 24 }),
     body("mood")
       .optional()
       .isIn(["Happy", "Neutral", "Sad", "Anxious", "Excited", "Frustrated"]),
@@ -151,5 +160,6 @@ doctorRouter.post(
   doctorController.addPatient
 );
 
+doctorRouter.get('/patients-list/:doctorId', authMiddleware, doctorController.getPatientsList);
 
 module.exports = doctorRouter;

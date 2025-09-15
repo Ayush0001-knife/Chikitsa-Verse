@@ -32,7 +32,7 @@ module.exports.createPatient = async ({
   exercise_frequency,
   exercise_type,
   exercise_duration_minutes,
-  reports=[],
+  reports,
 }) => {
   if (
     !first_name ||
@@ -46,6 +46,7 @@ module.exports.createPatient = async ({
       "First name, last name, gender, date of birth, contact number, and email are required"
     );
   }
+
 const patient = await addPatientModel.create({
   patient_id,
   created_by,
@@ -92,7 +93,7 @@ const patient = await addPatientModel.create({
     exercise_type,
     exercise_duration_minutes
   },
-  reports,
-})
+reports,
+});
     return patient;
 };

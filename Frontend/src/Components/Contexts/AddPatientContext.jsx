@@ -29,70 +29,54 @@ export const AddPatientProvider = ({ children }) => {
   const [currentSection, setCurrentSection] = useState(0);
   const [expandedSections, setExpandedSections] = useState({ 0: true });
   const [formData, setFormData] = useState({
-    // Demographics
     first_name: "Aarav",
-    last_name: "Sharma",
+    last_name: "Kumar",
     gender: "Male",
-    date_of_birth: "1998-06-15",
-    contact_number: "9876543210",
-    email: "aarav.sharma@example.com",
-
-    // Anthropometrics
-    height: "168",
-    weight: "62",
-    bmi: "22.0",
-    waist_circumference: "78",
-    hip_circumference: "90",
-    waist_to_hip_ratio: "0.87",
-
-    // Cardiorespiratory
-    vo2_max: "40",
-    blood_pressure_systolic: "118",
-    blood_pressure_diastolic: "76",
-    resting_heart_rate: "70",
+    date_of_birth: "1990-07-05",
+    contact_number: "9876543213",
+    email: "aarav.kumar@example.com",
+    height: "180",
+    weight: "75",
+    bmi: "23.1",
+    waist_circumference: "85",
+    hip_circumference: "92",
+    waist_to_hip_ratio: "0.92",
+    vo2_max: "45",
+    blood_pressure_systolic: "125",
+    blood_pressure_diastolic: "80",
+    resting_heart_rate: "74",
     oxygen_saturation: "97",
-    respiratory_rate: "15",
-    pulse_rate: "70",
-
-    // Nutrition
-    dietary_preference: "Vegetarian",
-    daily_meal_count: "4",
-    water_intake_liters: "3.0",
-    calorie_intake_estimate: "2100",
-    protein_intake: "75",
+    respiratory_rate: "16",
+    pulse_rate: "74",
+    dietary_preference: "Non-Vegetarian",
+    daily_meal_count: "3",
+    water_intake_liters: "2.8",
+    calorie_intake_estimate: "2600",
+    protein_intake: "95",
     fibre_intake: "30",
-
-    // Blood Tests
+    allergies: "None",
+    current_medications: "Vitamin B12",
     blood_group: "B+",
-    fasting_blood_sugar: "90",
-    hba1c: "5.2",
-    cholesterol_total: "175",
-    hdl: "55",
-    ldl: "100",
-    triglycerides: "140",
-
-    // Mental Health
-    stress_level: "3",
-    sleep_quality_hours: "8",
-    mood: "Calm",
-    energy_level: "8",
-    focus_level: "7",
-    anxiety_level: "2",
-
-    // Exercise
-    exercise_frequency: "5",
-    exercise_type: "Cardio + Yoga",
-    exercise_duration_minutes: "50",
-    average_daily_steps: "9000",
+    fasting_blood_sugar: "92",
+    hba1c: "5.3",
+    cholesterol_total: "190",
+    hdl: "62",
+    ldl: "110",
+    triglycerides: "145",
+    stress_level: "5",
+    sleep_quality_hours: "6",
+    mood: "Neutral",
+    energy_level: "7",
+    focus_level: "6",
+    anxiety_level: "4",
+    exercise_frequency: "3",
+    exercise_type: "Cycling",
+    exercise_duration_minutes: "40",
+    average_daily_steps: "8500",
     intensity_level: "Medium",
-    weekly_active_hours: "7",
-
-    // Clinical Details
-    allergies: "Peanuts",
-    current_medications: "Vitamin D supplements",
+    weekly_active_hours: "5",
     analysis_report: null,
-
-    created_by: "2",
+    created_by: "1",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -502,7 +486,6 @@ export const AddPatientProvider = ({ children }) => {
     const file = e.target.files[0];
     if (file) {
       setUploadedFile(file);
-      setFormData((prev) => ({ ...prev, analysis_report: file }));
     }
   };
 
@@ -534,7 +517,6 @@ export const AddPatientProvider = ({ children }) => {
       const sectionErrors = validateSection(index);
       allErrors = { ...allErrors, ...sectionErrors };
     });
-
     if (Object.keys(allErrors).length > 0) {
       setErrors(allErrors);
       return;
@@ -543,21 +525,28 @@ export const AddPatientProvider = ({ children }) => {
     try {
       setIsSubmitting(true);
 
-      // Build multipart form data
-      const formDataToSend = new FormData();
-
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === "analysis_report" && uploadedFile) {
-          formDataToSend.append("analysis_report", uploadedFile); // actual file
-        } else {
-          formDataToSend.append(key, value);
+      const data = new FormData();
+      for (const key in formData) {
+        if (formData[key] !== null && formData[key] !== undefined) {
+          data.append(key, formData[key]);
         }
-      });
+      }
 
-      // send request (make sure your addPatient in api.js handles FormData)
-      const response = await addPatient(formDataToSend, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      // ✅ Append file only once
+      if (uploadedFile) {
+        data.append("analysis_report", uploadedFile);
+      }
+
+      // console.log("📤 Payload being sent:");
+      // for (let [key, value] of data.entries()) {
+      //   console.log(
+      //     value instanceof File
+      //       ? `${key}: ${value.name} (${value.size} bytes)`
+      //       : `${key}: ${value}`
+      //   );
+      // }
+
+      const response = await addPatient(data);
 
       if (response.success) {
         navigate("/doctor-dashboard");
@@ -565,7 +554,7 @@ export const AddPatientProvider = ({ children }) => {
         setErrors({ submit: "Failed to add patient" });
       }
     } catch (err) {
-      console.error("Error adding patient:", err);
+      console.error("❌ Error adding patient:", err);
       setErrors({ submit: "An error occurred while adding patient" });
     } finally {
       setIsSubmitting(false);

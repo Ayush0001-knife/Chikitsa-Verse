@@ -194,18 +194,22 @@ const patientDataSchema = new mongoose.Schema({
     
     reports: [
         {
+            report_id: {
+                type: Number,
+                required: true
+            },
             file_name: {
                 type: String
             },
             file_type:{
                 type: String
             },
+            file_data: {
+                type: Buffer
+            },
             file_url: {
                 type: String
-            },       // or GridFS ID
-            ocr_text: {
-                type: String
-            },       // extracted searchable text
+            },      
             upload_date: { type: Date, default: Date.now }
         }
     ],   
@@ -217,7 +221,11 @@ patientDataSchema.statics.generatePatientId = function (contactNumber) {
   return parseInt(`${randomPart}${contactPart}`);
 };
 
-
+patientDataSchema.statics.generateReportId = function (patientId) {
+  const patientPart = String(patientId).slice(0, 5);
+  const randomPart = Math.floor(10000 + Math.random() * 90000);
+  return parseInt(`${patientPart}${randomPart}`);
+};
 
 const addPatientModel = mongoose.model("Patients", patientDataSchema);
 
