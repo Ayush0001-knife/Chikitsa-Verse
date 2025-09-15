@@ -9,7 +9,6 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useAuthentication } from "../Contexts/AuthenticationContext";
-import { useState } from "react";
 
 const Register = () => {
   const {
