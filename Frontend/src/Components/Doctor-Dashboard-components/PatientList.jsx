@@ -7,15 +7,25 @@ const PatientList = ({
   setSearchTerm,
   selectedFilter,
   setSelectedFilter,
+  patients,
 }) => {
-  const { patients } = usePatientTable();
+  // const { patients } = usePatientTable();
 
   const filteredPatients = patients.filter((p) => {
-    const matchesSearch = p.name
+    const fullName = `${p.demographics?.first_name || ""} ${
+      p.demographics?.last_name || ""
+    }`.trim();
+
+    const matchesSearch = fullName
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
+
+    // You don’t have `status` in your data → fallback to "pending" or something
+    const status = p.status || "pending";
+
     const matchesFilter =
-      selectedFilter === "all" || p.status.toLowerCase() === selectedFilter;
+      selectedFilter === "all" || status.toLowerCase() === selectedFilter;
+
     return matchesSearch && matchesFilter;
   });
 
@@ -32,7 +42,7 @@ const PatientList = ({
     }
   };
 
-  const getAvatarColor = (name) => {
+  const getAvatarColor = (name = "") => {
     const colors = [
       "bg-teal-500",
       "bg-blue-500",
@@ -40,7 +50,20 @@ const PatientList = ({
       "bg-pink-500",
       "bg-indigo-500",
     ];
+    if (!name) return colors[0];
     return colors[name.charCodeAt(0) % colors.length];
+  };
+
+  const getAge = (dob) => {
+    if (!dob) return "-";
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   const navigate = useNavigate();
@@ -126,35 +149,46 @@ const PatientList = ({
                 <div className="col-span-4 md:col-span-3 flex items-center gap-3">
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold ${getAvatarColor(
-                      patient.name
+                      patient.demographics?.first_name || ""
                     )} shadow-lg`}
                   >
-                    {patient.avatar}
+                    {`${(patient.demographics?.first_name || "").charAt(0)}${(
+                      patient.demographics?.last_name || ""
+                    ).charAt(0)}`}
                   </div>
+
                   <div>
                     <div className="font-semibold text-gray-800 group-hover:text-teal-700 transition-colors duration-300">
-                      {patient.name}
+                      {`${patient.demographics?.first_name || ""} ${
+                        patient.demographics?.last_name || ""
+                      }` || "-"}
                     </div>
                     <div className="text-sm text-gray-500">
-                      Last visit:{" "}
-                      {new Date(patient.lastVisit).toLocaleDateString()}
+                      Created At :{" "}
+                      {patient.created_at
+                        ? new Date(patient.created_at).toLocaleString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "N/A"}{" "}
                     </div>
                   </div>
                 </div>
 
                 {/* Gender */}
                 <div className="col-span-2 hidden md:block text-gray-600">
-                  {patient.gender || "-"}
+                  {patient.demographics?.gender || "-"}
                 </div>
 
                 {/* Age */}
                 <div className="col-span-2 text-gray-800 font-medium">
-                  {patient.age}
+                  {getAge(patient.demographics?.date_of_birth)}
                 </div>
 
                 {/* BMI */}
                 <div className="col-span-2 hidden md:block text-gray-600">
-                  {patient.bmi || "-"}
+                  {patient.anthropometrics?.bmi || "-"}
                 </div>
 
                 {/* Status */}

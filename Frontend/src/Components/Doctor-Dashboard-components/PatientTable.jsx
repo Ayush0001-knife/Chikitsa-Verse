@@ -7,6 +7,7 @@ const PatientTable = ({
   setSearchTerm,
   selectedFilter,
   setSelectedFilter,
+  patients,
 }) => {
   return (
     <>
@@ -16,6 +17,7 @@ const PatientTable = ({
         setSearchTerm={setSearchTerm}
         selectedFilter={selectedFilter}
         setSelectedFilter={setSelectedFilter}
+        patients={patients}
       />
     </>
   );

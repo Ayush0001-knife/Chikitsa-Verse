@@ -4,8 +4,6 @@ import QuickActions from "../Components/Doctor-Dashboard-components/QuickActions
 import PatientTable from "../Components/Doctor-Dashboard-components/PatientTable";
 import { getPatientsList } from "../Services/api";
 import { useEffect } from "react";
-import { useContext } from "react";
-import { useAuthentication } from "../Components/Contexts/AuthenticationContext";
 
 const DoctorDashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -18,12 +16,10 @@ const DoctorDashboard = () => {
     const fetchPatients = async () => {
       try {
         if (!doctorId) return; // Ensure doctorId is available
-        console.log("Doctor ID:", doctorId);
-
         const data = await getPatientsList(doctorId); // Pass doctorId to your API service
         if (data.success) {
           setPatients(data.patients);
-          console.log("Patients fetched:", data.patients);
+          console.log(data.patients);
         } else {
           console.error("Failed to fetch patients:", data.message);
         }
@@ -54,6 +50,7 @@ const DoctorDashboard = () => {
           setSearchTerm={setSearchTerm}
           selectedFilter={selectedFilter}
           setSelectedFilter={setSelectedFilter}
+          patients={patients}
         />
       </div>
       <QuickActions />
